@@ -16,6 +16,9 @@ var (
 		"Home": 2,
 		"Server": 3,
 		"Empty": 4}*/
+
+	nodeMap map[string]int
+	pendingLinks map[int]string
 )
 
 type NodeConverter struct {
@@ -23,6 +26,9 @@ type NodeConverter struct {
 }
 
 func NewNodeConverter(client RestClient.APIClient) NodeConverter {
+	nodeMap = make(map[string]int)
+	pendingLinks = make(map[int]string)
+
 	return NodeConverter{client}
 }
 
@@ -39,7 +45,7 @@ func (c *NodeConverter) FetchPrelims() {
 	}
 }
 
-// TODO: Read in and convert Computer Files
+// DONE: Read in and convert Computer Files
 // TODO: Read in and convert DLinks
 // TODO: Apply Proxy and Firewall Settings (if any)
 
@@ -116,5 +122,22 @@ func (c *NodeConverter) ConvertNode(nInfo *dModels.Node) rModels.Node {
 		c.client.AddFile(newFile.FileID, newNode.NodeID)
 	}
 
+	nodeMap[rNode.ID] = rNode.NodeID
+
+	for _, link := range nInfo.Links {
+		pendingLinks[newNode.NodeID] = link.Target
+		//c.client.CreateLink()
+	}
+
 	return rNode
+}
+
+func (c *NodeConverter) CreateNodeLinks() {
+	for parentID, child := range pendingLinks {
+		childNodeId, ok := nodeMap[child]
+
+		if ok {
+			c.client.CreateLink(parentID, childNodeId)
+		}
+	}
 }

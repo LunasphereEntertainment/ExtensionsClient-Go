@@ -16,10 +16,15 @@ type Node struct {
 	AllowsDefaultBootModule bool `xml:"allowsDefaultBootModule,attr"`
 
 	Files []File `xml:"file"`
+	Links []DLink `xml:"link"`
 }
 
 type File struct {
 	Path string `xml:"path,attr"`
 	Name string `xml:"name,attr"`
 	Content string `xml:",chardata"`
+}
+
+type DLink struct {
+	Target string `xml:"target"`
 }
