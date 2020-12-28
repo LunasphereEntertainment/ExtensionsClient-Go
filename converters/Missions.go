@@ -6,7 +6,6 @@ import (
 	rModels "HNExtensionConverter/RestClient/models"
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
 )
 
@@ -136,7 +135,7 @@ func (c *MissionConverter) processMissionGoals(missionId int, goals dModels.Miss
 			TypeID: goalTypeMap[goal.Type],
 		}
 
-		
+		fmt.Sprintf("%+v\n", rGoal)
 	}
 }
 

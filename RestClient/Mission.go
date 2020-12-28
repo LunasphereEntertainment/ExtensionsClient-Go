@@ -224,7 +224,18 @@ func (c *APIClient) DeleteAttachment(attachmentId int) error {
 }
 
 func (c *APIClient) LinkEmailAttachment(emailId, attachmentId int) error {
-	req, err := c.Build("GET", fmt.Sprintf("missions/email/attachment/map?email=%d&attachment=%d", emailId, attachmentId), nil)
+	req, err := c.Build("GET", fmt.Sprintf("missions/email/attachment/link/%d/%d", emailId, attachmentId), nil)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do(req, nil)
+	return err
+}
+
+func (c *APIClient) RemoveEmailAttachment(emailId, attachmentId int) error {
+	req, err := c.Build("DELETE", fmt.Sprintf("missions/email/attachment/link/%d/%d", emailId, attachmentId), nil)
 
 	if err != nil {
 		return err

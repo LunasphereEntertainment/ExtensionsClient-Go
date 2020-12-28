@@ -183,8 +183,8 @@ func (c *APIClient) RemoveFile(fileID int, nodeId int) error {
 	return err
 }
 
-func (c *APIClient) CreateLink(parentId, chilId int) error {
-	path := fmt.Sprintf("nodes/dlinks/link?node=%d&dest=%d", parentId, chilId)
+func (c *APIClient) CreateLink(parentId, childId int) error {
+	path := fmt.Sprintf("nodes/dlinks/link/%d/%d", parentId, childId)
 
 	req, err := c.Build("GET", path, nil)
 
@@ -196,8 +196,8 @@ func (c *APIClient) CreateLink(parentId, chilId int) error {
 	return err
 }
 
-func (c *APIClient) RemoveLink(parentId, chilId int) error {
-	path := fmt.Sprintf("nodes/dlinks/link?node=%d&dest=%d", parentId, chilId)
+func (c *APIClient) RemoveLink(parentId, childId int) error {
+	path := fmt.Sprintf("nodes/dlinks/link/%d/%d", parentId, childId)
 
 	req, err := c.Build("DELETE", path, nil)
 
