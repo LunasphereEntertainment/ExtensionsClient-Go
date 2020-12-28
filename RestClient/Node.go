@@ -121,7 +121,7 @@ func (c *APIClient) GetFiles(nodeId int) ([]models.File, error) {
 }
 
 func (c *APIClient) CreateFile(file *models.File) (*models.File, error) {
-	req, err := c.Build("POST", "nodes/files/new", nil)
+	req, err := c.Build("POST", "nodes/files/new", file)
 
 	if err != nil {
 		return nil, err
@@ -157,8 +157,8 @@ func (c *APIClient) DeleteFile(fileId int) error {
 	return err
 }
 
-func (c *APIClient) AddFile(file *models.File, nodeId int) error {
-	path := fmt.Sprintf("nodes/files/map?file=%d&node=%d", file.FileID, nodeId)
+func (c *APIClient) AddFile(fileID int, nodeId int) error {
+	path := fmt.Sprintf("nodes/files/map?file=%d&node=%d", fileID, nodeId)
 
 	req, err := c.Build("GET", path, nil)
 
@@ -170,8 +170,8 @@ func (c *APIClient) AddFile(file *models.File, nodeId int) error {
 	return err
 }
 
-func (c *APIClient) RemoveFile(file *models.File, nodeId int) error {
-	path := fmt.Sprintf("nodes/files/unmap?file=%d&node=%d", file.FileID, nodeId)
+func (c *APIClient) RemoveFile(fileID int, nodeId int) error {
+	path := fmt.Sprintf("nodes/files/unmap?file=%d&node=%d", fileID, nodeId)
 
 	req, err := c.Build("GET", path, nil)
 

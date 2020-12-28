@@ -98,5 +98,23 @@ func (c *NodeConverter) ConvertNode(nInfo *dModels.Node) rModels.Node {
 		}
 	}
 
+	// Resolve and Create files for this node.
+	for _, file := range nInfo.Files {
+		rFile := &rModels.File{
+			//FileID:  0,
+			Path:    file.Path,
+			Name:    file.Name,
+			Content: file.Content,
+		}
+
+		newFile, err := c.client.CreateFile(rFile)
+		if err != nil {
+			panic(err)
+		}
+
+		// Map link between this file and this node.
+		c.client.AddFile(newFile.FileID, newNode.NodeID)
+	}
+
 	return rNode
 }

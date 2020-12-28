@@ -14,4 +14,12 @@ type Node struct {
 	PortsForCrack int `xml:"portsForCrack"`
 
 	AllowsDefaultBootModule bool `xml:"allowsDefaultBootModule,attr"`
+
+	Files []File `xml:"file"`
+}
+
+type File struct {
+	Path string `xml:"path,attr"`
+	Name string `xml:"name,attr"`
+	Content string `xml:",chardata"`
 }
