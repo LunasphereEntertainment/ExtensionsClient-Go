@@ -252,10 +252,24 @@ func (c *APIClient) GetGoalTypes() (*[]models.TypeDefinition, error) {
 		return nil, err
 	}
 
-	types := make([]models.TypeDefinition, 0)
-	_, err = c.Do(req, types)
+	//types := make([]models.TypeDefinition, 0)
+	var types []models.TypeDefinition
+	_, err = c.Do(req, &types)
 
 	return &types, err
+}
+
+func (c *APIClient) GetMissionFunctions() (*[]models.MissionFunctionDef, error) {
+	req, err := c.Build("GET", "missions/functions/list", nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var funcs []models.MissionFunctionDef
+	_, err = c.Do(req, &funcs)
+
+	return &funcs, err
 }
 
 //func (c *APIClient) CreateMissionGoal(goal )

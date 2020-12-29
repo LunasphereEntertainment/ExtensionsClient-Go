@@ -14,14 +14,15 @@ type MissionConverter struct {
 }
 
 var (
-	missionMap map[int]rModels.Mission
+	missionMap     map[int]rModels.Mission
 	missionPathMap map[string]int
 
-	pendingMissionLinks map[int]string
+	pendingMissionLinks    map[int]string
 	pendingMissionBranches map[int][]string
 
-
 	goalTypeMap map[string]int
+
+	functionMap map[string]int
 )
 
 func NewMissionConverter(client RestClient.APIClient) MissionConverter {
@@ -40,6 +41,15 @@ func NewMissionConverter(client RestClient.APIClient) MissionConverter {
 		goalTypeMap[gType.Name] = gType.TypeID
 	}
 
+	functionMap = make(map[string]int)
+	funcs, err := client.GetMissionFunctions()
+	if err != nil {
+		panic(err)
+	}
+	for _, mFunc := range *funcs {
+		functionMap[mFunc.DataName] = mFunc.FunctionID
+	}
+
 	return MissionConverter{client}
 }
 
@@ -48,11 +58,21 @@ func NewMissionConverter(client RestClient.APIClient) MissionConverter {
 // DONE: Process Mission Branches
 // DONE: Process Email Attachments
 
-
+func resolveFunction(fullFunction string) (string, int) {
+	for funcName, funcId := range functionMap {
+		if strings.HasPrefix(fullFunction, funcName) {
+			return strings.ReplaceAll(fullFunction, funcName+":", ""), funcId
+		}
+	}
+	return fullFunction, 0
+}
 
 func (c *MissionConverter) ConvertMission(path string, mission *dModels.Mission) rModels.Mission {
 
 	goals := make([]string, 0)
+
+	mStartMeta, mStartID := resolveFunction(mission.MissionStart.Function)
+	mEndMeta, mEndId := resolveFunction(mission.MissionEnd.Function)
 
 	rMission := rModels.Mission{
 		//MissionID:                      0,
@@ -60,10 +80,20 @@ func (c *MissionConverter) ConvertMission(path string, mission *dModels.Mission)
 		ID:                             mission.ID,
 		ActiveCheck:                    mission.ActiveCheck,
 		ShouldIgnoreSenderVerification: mission.ShouldIgnoreSenderVerification,
-		MissionStart:                   mission.MissionStart.Function,
-		MissionEnd:                     mission.MissionEnd.Function,
-		NextMission:                    0,
-		Goals:                          goals,
+		MissionStart: rModels.MissionActions{
+			FunctionID: mStartID,
+			Meta:       mStartMeta,
+			Value:      mission.MissionStart.Value,
+			Suppress:   mission.MissionStart.Suppress,
+		},
+		MissionEnd: rModels.MissionActions{
+			FunctionID: mEndId,
+			Meta:       mEndMeta,
+			Value:      mission.MissionEnd.Value,
+			Suppress:   mission.MissionEnd.Suppress,
+		},
+		NextMission: 0,
+		Goals:       goals,
 	}
 
 	newMission, err := c.client.CreateMission(rMission)
@@ -142,8 +172,8 @@ func (c *MissionConverter) processMissionGoals(missionId int, goals dModels.Miss
 func (c *MissionConverter) processEmailAttachments(emailId int, attachments dModels.EmailAttachmentCollection) {
 	for _, note := range attachments.Notes {
 		attachment := &rModels.EmailAttachment{
-			TypeID: 1,
-			Title: note.Title,
+			TypeID:  1,
+			Title:   note.Title,
 			Content: note.Content,
 		}
 
@@ -152,7 +182,7 @@ func (c *MissionConverter) processEmailAttachments(emailId int, attachments dMod
 
 	for _, link := range attachments.Links {
 		attachment := &rModels.EmailAttachment{
-			TypeID: 2,
+			TypeID:   2,
 			Computer: link.Comp,
 		}
 
@@ -161,7 +191,7 @@ func (c *MissionConverter) processEmailAttachments(emailId int, attachments dMod
 
 	for _, account := range attachments.Accounts {
 		attachment := &rModels.EmailAttachment{
-			TypeID: 3,
+			TypeID:   3,
 			Computer: account.Comp,
 			Username: account.User,
 			Password: account.Pass,
@@ -197,7 +227,6 @@ func (c *MissionConverter) CreateMissionLinks() {
 			fmt.Printf("Could not create NextMission link between Mission ID %d and PATH %s \n", parentId, path)
 		}
 	}
-
 
 	// Process the branch mission links...
 	for parentId, paths := range pendingMissionBranches {

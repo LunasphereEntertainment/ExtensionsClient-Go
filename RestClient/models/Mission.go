@@ -8,8 +8,8 @@ type Mission struct {
 	ActiveCheck bool `json:"activeCheck"`
 	ShouldIgnoreSenderVerification bool `json:"shouldIgnoreSenderVerification"`
 
-	MissionStart string `json:"missionStart,omitempty"`
-	MissionEnd string `json:"missionEnd,omitempty"`
+	MissionStart MissionActions `json:"missionStart,omitempty"`
+	MissionEnd MissionActions `json:"missionEnd,omitempty"`
 
 	NextMission int `json:"nextMission,omitempty"`
 
@@ -75,4 +75,17 @@ type MissionGoal struct {
 
 	//TypeText string `json:"typeText"`
 	Uni string `json:"uni"`
+}
+
+type MissionFunctionDef struct {
+	FunctionID int `json:"functionId"`
+	DisplayName string `json:"funcDisplayName"`
+	DataName string `json:"funcName"`
+}
+
+type MissionActions struct {
+	FunctionID int `json:"functionId,omitempty"`
+	Meta string `json:"meta,omitempty"`
+	Value int `json:"value,omitempty"`
+	Suppress bool `json:"suppress,omitempty"`
 }
