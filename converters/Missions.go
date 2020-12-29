@@ -54,9 +54,6 @@ func NewMissionConverter(client RestClient.APIClient) MissionConverter {
 }
 
 // TODO: Process Mission Goals
-// DONE: Process Next Mission(s)
-// DONE: Process Mission Branches
-// DONE: Process Email Attachments
 
 func resolveFunction(fullFunction string) (string, int) {
 	for funcName, funcId := range functionMap {

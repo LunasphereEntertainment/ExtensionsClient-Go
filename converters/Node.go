@@ -45,8 +45,6 @@ func (c *NodeConverter) FetchPrelims() {
 	}
 }
 
-// DONE: Read in and convert Computer Files
-// TODO: Read in and convert DLinks
 // TODO: Apply Proxy and Firewall Settings (if any)
 
 // ConvertNode - Converts XML node data into a Data model that can be submitted to the RESTful API
